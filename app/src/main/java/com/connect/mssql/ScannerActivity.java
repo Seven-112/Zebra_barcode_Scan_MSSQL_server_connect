@@ -125,7 +125,7 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         EMDKResults results = EMDKManager.getEMDKManager(getApplicationContext(), this);
 
 // Check the return status of getEMDKManager() and update the status TextView accordingly.
-        if (results.statusCode!=   EMDKResults.STATUS_CODE.SUCCESS) {
+        if (results.statusCode != EMDKResults.STATUS_CODE.SUCCESS) {
             updateStatus("EMDKManager object request failed!");
             return;
         } else {
@@ -196,10 +196,10 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         // Get a reference to EMDKManager
         this.emdkManager =  emdkManager;
 
-// Get a  reference to the BarcodeManager feature object
+        // Get a  reference to the BarcodeManager feature object
         initBarcodeManager();
 
-// Initialize the scanner
+        // Initialize the scanner
         initScanner();
 
         // Mr.Chui  ////////////////////////
@@ -274,14 +274,41 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
 //                dataView.append(result + "\n"); // editText
                 Toast.makeText(ScannerActivity.this, "Scanned barcode is " + result, Toast.LENGTH_SHORT).show();
                 product_date.setText(result);
+                handleBarcode(result);
             }
         });
+    }
+
+    private void handleBarcode(String result) {
+        len = result.length();
+        compPRODATE = result.substring(0,3);
+        compBARQTY_1 = result.substring(0,5);
+        compBARQTY_1 = result.substring(len-4);
+        compSSCC = result.substring(0,3);
+        if (compPRODATE.contains("91")) {
+            product_date.setText(result);// product date (91)2009
+        }
+        if (compBARQTY_1.contains("240") && compBARQTY_2.contains("30")) {
+            barcode_QTY.setText(result);//barcodeQTY (240)1234565433(30)1
+        }
+        if (compSSCC.contains("00")) {
+            sscc_info.setText(result);//sscc (00)1234567890
+        }
     }
 
     @Override
     protected void onDestroy() {
         // TODO Auto-generated method stub
         super.onDestroy();
+//        if (emdkManager != null) {
+//            emdkManager.release();
+//            emdkManager= null;
+//        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
         if (emdkManager != null) {
             emdkManager.release();
             emdkManager= null;

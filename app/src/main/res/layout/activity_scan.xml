@@ -38,7 +38,7 @@
         android:layout_width="match_parent"
         android:layout_below="@id/titleBar"
         android:layout_height="300dp"
-        android:visibility="gone"/>
+        android:visibility="visible"/>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_below="@+id/ordLineNoList"
@@ -63,7 +63,7 @@
             android:textSize="20dp"
             android:layout_marginTop="10dp"
             android:textAllCaps="false"
-            android:visibility="gone"/>
+            android:visibility="visible"/>
         <TextView
             android:id="@+id/ssccDisp"
             android:layout_width="match_parent"
@@ -74,7 +74,7 @@
             android:layout_below="@+id/barcodeQtyDisp"
             android:textSize="20dp"
             android:textAllCaps="false"
-            android:visibility="gone"/>
+            android:visibility="visible"/>
     </RelativeLayout>
     <Button
         android:layout_width="300dp"
