@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#52A0C0"
+    >
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true">
+        <EditText
+            android:id="@+id/ipaddressEdit"
+            android:layout_width="250dp"
+            android:hint="10.10.10.160"
+            android:layout_height="wrap_content"/>
+        <EditText
+            android:id="@+id/portNo"
+            android:layout_width="250dp"
+            android:hint="49172"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ipaddressEdit"/>
+        <EditText
+            android:id="@+id/dbName"
+            android:layout_width="250dp"
+            android:hint="Mobile_PT"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/portNo"/>
+
+        <EditText
+            android:id="@+id/tabelName"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/dbName"
+            android:hint="Warehouse_Shipments" />
+        <EditText
+            android:id="@+id/userName"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tabelName"
+            android:hint="mobile"/>
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/userName"
+            android:inputType="textPassword"
+            android:hint="mobile"/>
+        <Button
+            android:id="@+id/syncBtn"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/password"
+            android:layout_centerHorizontal="true"
+            android:text="sync connect"/>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
