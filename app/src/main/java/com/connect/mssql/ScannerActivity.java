@@ -49,6 +49,9 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
     private ListView listView;
     ArrayList<String> ordLineNo = new ArrayList<>();
     ArrayList<List> selectedProducts = new ArrayList<>();
+    ArrayList<List> InitPro = new ArrayList<>();
+    ArrayList<List> scannedPro = new ArrayList<>();
+    ArrayList<String> scannedEachPro = new ArrayList<>();
     ArrayList<Integer> images = new ArrayList<>();
     private String CSM_NO = "";
     private String ART_NO = "";
@@ -92,16 +95,10 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String proDate, barQTY, ssccInfo;
-                proDate = product_date.getText().toString();
-                barQTY = barcode_QTY.getText().toString();
-                ssccInfo = sscc_info.getText().toString();
 
                 Intent intent = new Intent(ScannerActivity.this, ArtListActivity.class);
                 intent.putExtra("CSM_NO", CSM_NO);
-                intent.putExtra("PRO_DATE", proDate);
-                intent.putExtra("BAR_QTY", barQTY);
-                intent.putExtra("SSCC_INFO", ssccInfo);
+
                 finish();
             }
         });
@@ -111,14 +108,14 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
 
         for (int i = 0; i < selectedProducts.size(); i ++) {
             if (selectedProducts.get(i).get(1).equals(CSM_NO) && selectedProducts.get(i).get(4).equals(ART_NO)) {
-//                if (selectedProducts.get(i).get(7).equals("") || selectedProducts.get(i).get(7) == null) {
-//                    if (selectedProducts.get(i).get(8).equals("") || selectedProducts.get(i).get(8) == null) {
-//                        if (selectedProducts.get(i).get(9).equals("") || selectedProducts.get(i).get(9) == null) {
-//                            ordLineNo.add((String) selectedProducts.get(i).get(3));
-//                        }
-//                    }
-//                }
-                ordLineNo.add((String) selectedProducts.get(i).get(3));
+                if (selectedProducts.get(i).get(7).equals("") || selectedProducts.get(i).get(7) == null) {
+                    if (selectedProducts.get(i).get(8).equals("") || selectedProducts.get(i).get(8) == null) {
+                        if (selectedProducts.get(i).get(9).equals("") || selectedProducts.get(i).get(9) == null) {
+                            ordLineNo.add((String) selectedProducts.get(i).get(3));
+                        }
+                    }
+                }
+//                ordLineNo.add((String) selectedProducts.get(i).get(3));
 
             }
 
@@ -127,6 +124,53 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         ScanListAdapter scanListAdapter = new ScanListAdapter(ScannerActivity.this, ordLineNo);
         listView.setAdapter(scanListAdapter);
 
+        if (!product_date.getText().toString().equals("") && !barcode_QTY.getText().toString().equals("") && !sscc_info.getText().toString().equals("")) {
+            listView.setVisibility(View.VISIBLE);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                    product_date.setText("");
+//                    barcode_QTY.setText("");
+//                    sscc_info.setText("");
+                    AllProducts products = new AllProducts();
+                    AllProducts newProducts = new AllProducts();
+                    InitPro = products.getAllproducts();
+                    for (int i = 0; i < InitPro.size(); i ++) {
+                        if (InitPro.get(i).get(1).equals(CSM_NO) && InitPro.get(i).get(4).equals(ART_NO) && InitPro.get(i).get(3).equals(ordLineNo.get(position))) {
+                            scannedEachPro.add((String) InitPro.get(i).get(0));
+                            scannedEachPro.add(CSM_NO);
+                            scannedEachPro.add((String) InitPro.get(i).get(2));
+                            scannedEachPro.add(ordLineNo.get(position));
+                            scannedEachPro.add(ART_NO);
+                            scannedEachPro.add((String) InitPro.get(i).get(5));
+                            scannedEachPro.add((String) InitPro.get(i).get(6));
+                            scannedEachPro.add(barcode_QTY.getText().toString());
+                            scannedEachPro.add(product_date.getText().toString());
+                            scannedEachPro.add(sscc_info.getText().toString());
+                            scannedPro.add(scannedEachPro);
+                        } else {
+                            scannedEachPro.add((String) InitPro.get(i).get(0));
+                            scannedEachPro.add((String) InitPro.get(i).get(1));
+                            scannedEachPro.add((String) InitPro.get(i).get(2));
+                            scannedEachPro.add((String) InitPro.get(i).get(3));
+                            scannedEachPro.add((String) InitPro.get(i).get(4));
+                            scannedEachPro.add((String) InitPro.get(i).get(5));
+                            scannedEachPro.add((String) InitPro.get(i).get(6));
+                            scannedEachPro.add((String) InitPro.get(i).get(7));
+                            scannedEachPro.add((String) InitPro.get(i).get(8));
+                            scannedEachPro.add((String) InitPro.get(i).get(9));
+                            scannedPro.add(scannedEachPro);
+                        }
+                    }
+                    newProducts.setAllproducts(scannedPro);
+
+                    Intent intent = new Intent(ScannerActivity.this, ArtListActivity.class);
+                    intent.putExtra("CSM_NO", CSM_NO);
+
+                    finish();
+                }
+            });
+        }
         EMDKResults results = EMDKManager.getEMDKManager(getApplicationContext(), this);
 
         // Check the return status of getEMDKManager() and update the status TextView accordingly.

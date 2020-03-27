@@ -22,9 +22,6 @@ import java.util.List;
 public class ArtListActivity extends AppCompatActivity {
 
     private String CSM_NO = "";
-    private String PRO_DATE = "";
-    private String BAR_QTY = "";
-    private String SSCC_INFO = "";
     ListView detailList;
     ArrayList<String> art_no_list = new ArrayList<>();
     ArrayList<String> ord_no_list = new ArrayList<>();
@@ -56,10 +53,6 @@ public class ArtListActivity extends AppCompatActivity {
 
         Intent extra = getIntent();
         CSM_NO = extra.getStringExtra("CSM_NO");
-        PRO_DATE = extra.getStringExtra("PRO_DATE");
-        BAR_QTY = extra.getStringExtra("BAR_QTY");
-        SSCC_INFO = extra.getStringExtra("SSCC_INFO");
-
 
         ArrayList<List> aaaa = new ArrayList<>();
 
