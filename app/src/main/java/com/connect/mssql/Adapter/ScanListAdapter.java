@@ -16,15 +16,15 @@ public class ScanListAdapter extends ArrayAdapter<String> {
 
     private final Activity context;
     private final List<String> ordLineNo;
-    private final List<Integer> images;
+//    private final List<Integer> images;
 
-    public ScanListAdapter(Activity context, List<String> ordLineNo, List<Integer> images) {
+    public ScanListAdapter(Activity context, List<String> ordLineNo) {
         super(context, R.layout.csmitem, ordLineNo);
         // TODO Auto-generated constructor stub
 
         this.context=context;
         this.ordLineNo = ordLineNo;
-        this.images = images;
+//        this.images = images;
     }
     @Override
     public View getView(int position, View view, ViewGroup parent) {
@@ -33,7 +33,7 @@ public class ScanListAdapter extends ArrayAdapter<String> {
         TextView ord_line_no = (TextView) rowView.findViewById(R.id.li_ordLineNo);
         ImageView scannedStatus = (ImageView) rowView.findViewById(R.id.li_isScannedImg);
         ord_line_no.setText(ordLineNo.get(position));
-        scannedStatus.setImageResource(images.get(position));
+//        scannedStatus.setImageResource(images.get(position));
         return rowView;
 
     }

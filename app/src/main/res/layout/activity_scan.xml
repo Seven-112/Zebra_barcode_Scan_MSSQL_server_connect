@@ -37,8 +37,8 @@
         android:id="@+id/ordLineNoList"
         android:layout_width="match_parent"
         android:layout_below="@id/titleBar"
-        android:layout_height="300dp"
-        android:visibility="visible"/>
+        android:layout_height="200dp"
+        android:visibility="gone"/>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_below="@+id/ordLineNoList"
@@ -50,14 +50,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Productdate"
+            android:hint="Productdate"
             android:textSize="20dp"
             android:textAllCaps="false"/>
         <TextView
             android:id="@+id/barcodeQtyDisp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="barcodeQTY"
+            android:hint="barcodeQTY"
             android:gravity="center"
             android:layout_below="@+id/proDateDisp"
             android:textSize="20dp"
@@ -68,36 +68,39 @@
             android:id="@+id/ssccDisp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="SSCC"
+            android:hint="SSCC"
             android:gravity="center"
             android:layout_marginTop="10dp"
             android:layout_below="@+id/barcodeQtyDisp"
             android:textSize="20dp"
             android:textAllCaps="false"
             android:visibility="visible"/>
+        <Button
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:text="Scan start"
+            android:textSize="25dp"
+            android:textAllCaps="false"
+            android:id="@+id/scanStartBtn"
+            android:layout_below="@+id/ssccDisp"
+            android:layout_marginTop="15dp"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"
+            />
+        <Button
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:text="Export XML"
+            android:textSize="25dp"
+            android:textAllCaps="false"
+            android:id="@+id/scanStopBtn"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"
+            android:layout_below="@+id/scanStartBtn"
+            android:layout_marginTop="15dp"
+            />
     </RelativeLayout>
-    <Button
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:text="Scan start"
-        android:textSize="25dp"
-        android:textAllCaps="false"
-        android:id="@+id/scanStartBtn"
-        android:layout_above="@+id/scanStopBtn"
-        android:layout_centerHorizontal="true"
-        android:visibility="gone"
-        />
-    <Button
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:text="Scan stop"
-        android:textSize="25dp"
-        android:textAllCaps="false"
-        android:id="@+id/scanStopBtn"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="30dp"
-        android:visibility="gone"
-        />
+
+
 
 </RelativeLayout>

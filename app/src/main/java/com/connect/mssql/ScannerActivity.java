@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.QuickContactBadge;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -43,14 +45,14 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
     private Boolean isClicked = false;
     TextView product_date, barcode_QTY, sscc_info;
     ImageView backBtn;
-    Button scanBtn, stopBtn;
+    Button scanBtn, exportBtn;
     private ListView listView;
     ArrayList<String> ordLineNo = new ArrayList<>();
     ArrayList<List> selectedProducts = new ArrayList<>();
     ArrayList<Integer> images = new ArrayList<>();
     private String CSM_NO = "";
     private String ART_NO = "";
-
+    AllProducts allProducts = new AllProducts();
     //TODO; emdk parts
     //Assign the profile name used in EMDKConfig.xml
     private String profileName = "DataCaptureProfile";
@@ -78,21 +80,9 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         sscc_info = findViewById(R.id.ssccDisp);
 
         scanBtn = findViewById(R.id.scanStartBtn);
-        stopBtn = findViewById(R.id.scanStopBtn);
-        scanBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isClicked = true;
-                scanBtn.setText("Scanning ... ");
-            }
-        });
-        stopBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isClicked = false;
-                scanBtn.setText("Scan start");
-            }
-        });
+        exportBtn = findViewById(R.id.scanStopBtn);
+
+
         this.overridePendingTransition(R.anim.animation_enter,
                 R.anim.animation_leave);
 
@@ -102,29 +92,44 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String proDate, barQTY, ssccInfo;
+                proDate = product_date.getText().toString();
+                barQTY = barcode_QTY.getText().toString();
+                ssccInfo = sscc_info.getText().toString();
+
                 Intent intent = new Intent(ScannerActivity.this, ArtListActivity.class);
                 intent.putExtra("CSM_NO", CSM_NO);
+                intent.putExtra("PRO_DATE", proDate);
+                intent.putExtra("BAR_QTY", barQTY);
+                intent.putExtra("SSCC_INFO", ssccInfo);
                 finish();
             }
         });
 
-        AllProducts allProducts = new AllProducts();
+
         selectedProducts = allProducts.getAllproducts();
 
         for (int i = 0; i < selectedProducts.size(); i ++) {
             if (selectedProducts.get(i).get(1).equals(CSM_NO) && selectedProducts.get(i).get(4).equals(ART_NO)) {
+//                if (selectedProducts.get(i).get(7).equals("") || selectedProducts.get(i).get(7) == null) {
+//                    if (selectedProducts.get(i).get(8).equals("") || selectedProducts.get(i).get(8) == null) {
+//                        if (selectedProducts.get(i).get(9).equals("") || selectedProducts.get(i).get(9) == null) {
+//                            ordLineNo.add((String) selectedProducts.get(i).get(3));
+//                        }
+//                    }
+//                }
                 ordLineNo.add((String) selectedProducts.get(i).get(3));
-                images.add(R.drawable.unscanned);
+
             }
 
         }
 
-        ScanListAdapter scanListAdapter = new ScanListAdapter(ScannerActivity.this, ordLineNo, images);
+        ScanListAdapter scanListAdapter = new ScanListAdapter(ScannerActivity.this, ordLineNo);
         listView.setAdapter(scanListAdapter);
 
         EMDKResults results = EMDKManager.getEMDKManager(getApplicationContext(), this);
 
-// Check the return status of getEMDKManager() and update the status TextView accordingly.
+        // Check the return status of getEMDKManager() and update the status TextView accordingly.
         if (results.statusCode != EMDKResults.STATUS_CODE.SUCCESS) {
             updateStatus("EMDKManager object request failed!");
             return;
@@ -202,43 +207,6 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         // Initialize the scanner
         initScanner();
 
-        // Mr.Chui  ////////////////////////
-
-//        if (!isClicked) {
-//
-//            ScanDataCollection scanDataCollection = new ScanDataCollection();
-//            List<ScanDataCollection.ScanData> scanData = scanDataCollection.getScanData();
-//            if (scanData.size() > 0) {
-//                //get only the first result
-//                ScanDataCollection.ScanData data = scanData.get(0);
-//                String qrCodeData = data.getData();
-//
-//                Toast.makeText(ScannerActivity.this, qrCodeData, Toast.LENGTH_LONG).show();
-//            }
-//            scannedData = results.getStatusString();
-//            product_date.setText(scannedData);
-//            len = scannedData.length();
-//            compPRODATE = scannedData.substring(0,3);
-//            compBARQTY_1 = scannedData.substring(0,5);
-//            compBARQTY_1 = scannedData.substring(len-4);
-//            compSSCC = scannedData.substring(0,3);
-//            if (compPRODATE.contains("91")) {
-//                product_date.setText(results.statusCode + "");
-//            }
-//            if (compBARQTY_1.contains("240") && compBARQTY_2.contains("30")) {
-//                barcode_QTY.setText(results.statusCode + "");
-//            }
-//            if (compSSCC.contains("00")) {
-//                sscc_info.setText(results.statusCode + "");
-//            }
-//
-//
-//
-//        } else {
-//            Toast.makeText(ScannerActivity.this, "You don't click start button", Toast.LENGTH_SHORT).show();
-//        }
-
-        ///////////////////////
 
     }
     public void onData(ScanDataCollection scanDataCollection) {
