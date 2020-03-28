@@ -291,6 +291,7 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         });
     }
 
+    //TODO; barcode scaning result compare process here
     private void handleBarcode(String result) {
         len = result.length();
         compPRODATE = result.substring(0,3);
