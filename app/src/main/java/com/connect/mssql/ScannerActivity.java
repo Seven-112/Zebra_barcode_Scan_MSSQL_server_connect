@@ -84,13 +84,18 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
     String compBARQTY_1 = "";
     String compBARQTY_2 = "";
     String compSSCC = "";
+
+    Boolean flag_1 = false;
+    Boolean flag_2 = false;
+    Boolean flag_3 = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
         backBtn = findViewById(R.id.backBtn);
         listView = findViewById(R.id.ordLineNoList);
-
+//        listView.setVisibility(View.GONE);
         product_date = findViewById(R.id.proDateDisp);
         barcode_QTY = findViewById(R.id.barcodeQtyDisp);
         sscc_info = findViewById(R.id.ssccDisp);
@@ -320,19 +325,26 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         len = result.length();
         compPRODATE = result.substring(0,2);
         compBARQTY_1 = result.substring(0,3);
-        compBARQTY_1 = result.substring(len-3);
+        compBARQTY_2 = result.substring(len-3);
         compSSCC = result.substring(0,2);
-        if (compPRODATE.equals("91")) {
-            product_date.setText(result.substring(2, len));// product date (91)2009 -> result will be write to 2009 on first field
-        } else
-////        if (compBARQTY_1.equals("240") && compBARQTY_2.contains("30")) {
-//        if (compBARQTY_1.equals("240")) {
-//            barcode_QTY.setText(result.substring(len-1));//barcodeQTY (240)1234565433(30)1 -> result will be write to 1 on second field
-//        }
-        if (compSSCC.equals("00")) {
-            sscc_info.setText(result.substring(2));//sscc (00)1234567890 -> result will be write to 1234567890 on last field
-        } else {
-            barcode_QTY.setText(result);
+
+        if (!flag_1) {
+            if (compPRODATE.equals("91")) {
+                product_date.setText(result.substring(2, len));
+                flag_1 = true;
+            }
+        }
+        if (!flag_2) {
+            if (compBARQTY_1.equals("240") && compBARQTY_2.contains("30")) {
+                barcode_QTY.setText(result.substring(len-1));
+                flag_2 = true;
+            }
+        }
+        if (!flag_3) {
+            if (compSSCC.equals("00")) {
+                sscc_info.setText(result.substring(2));
+                flag_3 = true;
+            }
         }
     }
 
