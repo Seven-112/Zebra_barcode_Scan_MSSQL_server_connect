@@ -1,7 +1,10 @@
 package com.connect.mssql;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -34,6 +37,11 @@ import com.symbol.emdk.barcode.StatusData;
 import com.symbol.emdk.barcode.StatusData.ScannerStates;
 
 import java.lang.reflect.Array;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +50,11 @@ import static com.symbol.emdk.barcode.StatusData.ScannerStates.ERROR;
 import static com.symbol.emdk.barcode.StatusData.ScannerStates.SCANNING;
 
 public class ScannerActivity extends AppCompatActivity implements EMDKListener, StatusListener, DataListener{
+
+    Connection con;
+    String username, password, databasename, ipaddress, portNumber, dbTableName;
+    SharedPreferences pref;
+
     private Boolean isClicked = false;
     TextView product_date, barcode_QTY, sscc_info;
     ImageView backBtn;
@@ -92,6 +105,8 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         Intent extra = getIntent();
         CSM_NO = extra.getStringExtra("CSM_NO");
         ART_NO = extra.getStringExtra("ART_NO");
+
+        getOldData();
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,45 +144,42 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                    product_date.setText("");
-//                    barcode_QTY.setText("");
-//                    sscc_info.setText("");
-                    AllProducts products = new AllProducts();
-                    AllProducts newProducts = new AllProducts();
-                    InitPro = products.getAllproducts();
-                    for (int i = 0; i < InitPro.size(); i ++) {
-                        if (InitPro.get(i).get(1).equals(CSM_NO) && InitPro.get(i).get(4).equals(ART_NO) && InitPro.get(i).get(3).equals(ordLineNo.get(position))) {
-                            scannedEachPro.add((String) InitPro.get(i).get(0));
-                            scannedEachPro.add(CSM_NO);
-                            scannedEachPro.add((String) InitPro.get(i).get(2));
-                            scannedEachPro.add(ordLineNo.get(position));
-                            scannedEachPro.add(ART_NO);
-                            scannedEachPro.add((String) InitPro.get(i).get(5));
-                            scannedEachPro.add((String) InitPro.get(i).get(6));
-                            scannedEachPro.add(barcode_QTY.getText().toString());
-                            scannedEachPro.add(product_date.getText().toString());
-                            scannedEachPro.add(sscc_info.getText().toString());
-                            scannedPro.add(scannedEachPro);
-                        } else {
-                            scannedEachPro.add((String) InitPro.get(i).get(0));
-                            scannedEachPro.add((String) InitPro.get(i).get(1));
-                            scannedEachPro.add((String) InitPro.get(i).get(2));
-                            scannedEachPro.add((String) InitPro.get(i).get(3));
-                            scannedEachPro.add((String) InitPro.get(i).get(4));
-                            scannedEachPro.add((String) InitPro.get(i).get(5));
-                            scannedEachPro.add((String) InitPro.get(i).get(6));
-                            scannedEachPro.add((String) InitPro.get(i).get(7));
-                            scannedEachPro.add((String) InitPro.get(i).get(8));
-                            scannedEachPro.add((String) InitPro.get(i).get(9));
-                            scannedPro.add(scannedEachPro);
+
+                    con = connectionclass(username, password, databasename, ipaddress + ":" + portNumber);
+
+                    if (con == null) {
+                        Log.i("connection status", "connection null");
+                        Toast.makeText(ScannerActivity.this, "connection is failed", Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        Log.i("connection is", "successful");
+                        Toast.makeText(ScannerActivity.this, "connection is successful", Toast.LENGTH_SHORT).show();
+                        Statement stmt = null;
+                        int cnt = 0;
+                        try {
+                            //TODO, scanned data directly update to SQL database here
+                            stmt = con.createStatement();
+                            String query1 = "UPDATE " + dbTableName + " SET " + "BARCODE_QTY " + barcode_QTY + " WHERE " + "ORD_LINE_NO =" + ordLineNo.get(position);
+                            String query2 = "UPDATE " + dbTableName + " SET " + "PROD_DATE " + product_date + " WHERE " + "ORD_LINE_NO =" + ordLineNo.get(position);
+                            String query3 = "UPDATE " + dbTableName + " SET " + "SSCC " + sscc_info + " WHERE " + "ORD_LINE_NO =" + ordLineNo.get(position);
+                            stmt.executeUpdate(query1);
+                            stmt.executeUpdate(query2);
+                            stmt.executeUpdate(query3);
+                            Toast.makeText(ScannerActivity.this, "Update " + dbTableName + " successful !", Toast.LENGTH_SHORT).show();
+//                            ResultSet reset = stmt.executeQuery(" select * from " + dbTableName);
+//
+//                            while (reset.next())
+//                            {
+//
+//                            }
+
+                            con.close();
+
+                        }
+                        catch (SQLException e) {
+                            Log.e("ERROR", e.getMessage());
                         }
                     }
-                    newProducts.setAllproducts(scannedPro);
-
-                    Intent intent = new Intent(ScannerActivity.this, ArtListActivity.class);
-                    intent.putExtra("CSM_NO", CSM_NO);
-
-                    finish();
                 }
             });
         }
@@ -181,6 +193,18 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
             updateStatus("EMDKManager object initialization is   in   progress.......");
         }
 
+    }
+
+    private void getOldData() {
+        pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+
+        // retrieve data
+        ipaddress = pref.getString("ipaddress", "");
+        portNumber = pref.getString("portNo", "");
+        databasename = pref.getString("databasename", "");
+        dbTableName = pref.getString("tableName", "");
+        username = pref.getString("username", "");
+        password = pref.getString("password", "");
     }
 
     private void initBarcodeManager() {
@@ -294,18 +318,18 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
     //TODO; barcode scaning result compare process here
     private void handleBarcode(String result) {
         len = result.length();
-        compPRODATE = result.substring(0,3);
-        compBARQTY_1 = result.substring(0,5);
-        compBARQTY_1 = result.substring(len-4);
-        compSSCC = result.substring(0,3);
-        if (compPRODATE.contains("91")) {
-            product_date.setText(result);// product date (91)2009
+        compPRODATE = result.substring(0,2);
+        compBARQTY_1 = result.substring(0,3);
+        compBARQTY_1 = result.substring(len-3);
+        compSSCC = result.substring(0,2);
+        if (compPRODATE.equals("91")) {
+            product_date.setText(result.substring(2, len));// product date (91)2009 -> result will be write to 2009 on first field
         }
-        if (compBARQTY_1.contains("240") && compBARQTY_2.contains("30")) {
-            barcode_QTY.setText(result);//barcodeQTY (240)1234565433(30)1
+        if (compBARQTY_1.equals("240") && compBARQTY_2.contains("30")) {
+            barcode_QTY.setText(result.substring(len-1));//barcodeQTY (240)1234565433(30)1 -> result will be write to 1 on second field
         }
-        if (compSSCC.contains("00")) {
-            sscc_info.setText(result);//sscc (00)1234567890
+        if (compSSCC.equals("00")) {
+            sscc_info.setText(result.substring(2));//sscc (00)1234567890 -> result will be write to 1234567890 on last field
         }
     }
 
@@ -406,5 +430,37 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
             updateStatus(e.getMessage());
         }
         }
+    }
+
+    @SuppressLint("NewApi")
+    public Connection connectionclass(String username, String password, String databasename, String ipaddress) {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        Connection connection = null;
+        String ConnectionUrl;
+        try {
+//            Toast.makeText(MainActivity.this, "step_1",Toast.LENGTH_SHORT).show();
+            Class.forName("net.sourceforge.jtds.jdbc.Driver");
+            ConnectionUrl = "jdbc:jtds:sqlserver://" + ipaddress + ";" + "databaseName=" + databasename + ";user=" + username + ";password=" + password + ";";
+            connection = DriverManager.getConnection(ConnectionUrl);
+//            Toast.makeText(MainActivity.this, "step_2",Toast.LENGTH_SHORT).show();
+
+        }
+        catch (SQLException se) {
+//            Toast.makeText(MainActivity.this, "step_3",Toast.LENGTH_SHORT).show();
+
+            Log.e("SQL", se.getMessage());
+        }
+        catch (ClassNotFoundException e) {
+//            Toast.makeText(MainActivity.this, "step_4",Toast.LENGTH_SHORT).show();
+
+            Log.e("ClassNotFound", e.getMessage());
+        }
+        catch (Exception e) {
+//            Toast.makeText(MainActivity.this, "step_5",Toast.LENGTH_SHORT).show();
+
+            Log.e("Exception", e.getMessage());
+        }
+        return connection;
     }
 }

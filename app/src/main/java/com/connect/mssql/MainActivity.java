@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
                     int cnt = 0;
                     try {
                         stmt = con.createStatement();
+
                         ResultSet reset = stmt.executeQuery(" select * from " + dbTableName);
 
                         while (reset.next())
@@ -187,7 +188,6 @@ public class MainActivity extends AppCompatActivity {
                         AllProducts allProducts = new AllProducts();
 
                         allProducts.setAllproducts(allPro);
-//                        Toast.makeText(MainActivity.this, "Products Counts is " + allPro.size() + ".", Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(MainActivity.this, CsmListActivity.class);
                         startActivity(intent);
 

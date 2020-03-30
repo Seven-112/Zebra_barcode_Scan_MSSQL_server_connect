@@ -133,7 +133,6 @@ public class CsmListActivity extends AppCompatActivity {
                 }else {
                     Intent intent1 = new Intent(CsmListActivity.this, ArtListActivity.class);
                     intent1.putExtra("CSM_NO", csmList.get(i));
-
                     startActivity(intent1);
                 }
             }
