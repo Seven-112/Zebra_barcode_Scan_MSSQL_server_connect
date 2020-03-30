@@ -128,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
                     int cnt = 0;
                     try {
                         stmt = con.createStatement();
-
                         ResultSet reset = stmt.executeQuery(" select * from " + dbTableName);
 
                         while (reset.next())

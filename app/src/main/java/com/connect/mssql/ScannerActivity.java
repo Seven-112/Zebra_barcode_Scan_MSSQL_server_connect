@@ -139,50 +139,7 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         ScanListAdapter scanListAdapter = new ScanListAdapter(ScannerActivity.this, ordLineNo);
         listView.setAdapter(scanListAdapter);
 
-        if (!product_date.getText().toString().equals("") && !barcode_QTY.getText().toString().equals("") && !sscc_info.getText().toString().equals("")) {
-            listView.setVisibility(View.VISIBLE);
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    con = connectionclass(username, password, databasename, ipaddress + ":" + portNumber);
-
-                    if (con == null) {
-                        Log.i("connection status", "connection null");
-                        Toast.makeText(ScannerActivity.this, "connection is failed", Toast.LENGTH_SHORT).show();
-
-                    } else {
-                        Log.i("connection is", "successful");
-                        Toast.makeText(ScannerActivity.this, "connection is successful", Toast.LENGTH_SHORT).show();
-                        Statement stmt = null;
-                        int cnt = 0;
-                        try {
-                            //TODO, scanned data directly update to SQL database here
-                            stmt = con.createStatement();
-                            String query1 = "UPDATE " + dbTableName + " SET " + "BARCODE_QTY " + barcode_QTY + " WHERE " + "ORD_LINE_NO =" + ordLineNo.get(position);
-                            String query2 = "UPDATE " + dbTableName + " SET " + "PROD_DATE " + product_date + " WHERE " + "ORD_LINE_NO =" + ordLineNo.get(position);
-                            String query3 = "UPDATE " + dbTableName + " SET " + "SSCC " + sscc_info + " WHERE " + "ORD_LINE_NO =" + ordLineNo.get(position);
-                            stmt.executeUpdate(query1);
-                            stmt.executeUpdate(query2);
-                            stmt.executeUpdate(query3);
-                            Toast.makeText(ScannerActivity.this, "Update " + dbTableName + " successful !", Toast.LENGTH_SHORT).show();
-//                            ResultSet reset = stmt.executeQuery(" select * from " + dbTableName);
-//
-//                            while (reset.next())
-//                            {
-//
-//                            }
-
-                            con.close();
-
-                        }
-                        catch (SQLException e) {
-                            Log.e("ERROR", e.getMessage());
-                        }
-                    }
-                }
-            });
-        }
         EMDKResults results = EMDKManager.getEMDKManager(getApplicationContext(), this);
 
         // Check the return status of getEMDKManager() and update the status TextView accordingly.
@@ -283,16 +240,19 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         if ((scanDataCollection != null) &&   (scanDataCollection.getResult() == ScannerResults.SUCCESS)) {
             ArrayList<ScanData> scanData =  scanDataCollection.getScanData();
             // Iterate through scanned data and prepare the data.
-            for (ScanData data :  scanData) {
-                // Get the scanned dataString barcodeData =  data.getData();
-                // Get the type of label being scanned
-                ScanDataCollection.LabelType labelType = data.getLabelType();
-                // Concatenate barcode data and label type
-                String barcodeData = data.getData();
+
+//            ScanDataCollection.LabelType labelType = data.getLabelType();
+            // Concatenate barcode data and label type
+            String barcodeData = scanData.get(0).getData();
 //                product_date.setText(barcodeData);
-                dataStr =  barcodeData;
-//                dataStr =  barcodeData + "  " +  labelType;
-            }
+            dataStr =  barcodeData;
+
+//            for (ScanData data :  scanData) {
+//                // Get the scanned dataString barcodeData =  data.getData();
+//                // Get the type of label being scanned
+//
+////                dataStr =  barcodeData + "  " +  labelType;
+//            }
             // Updates EditText with scanned data and type of label on UI thread.
             updateData(dataStr);
         }
@@ -311,8 +271,48 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
                 Toast.makeText(ScannerActivity.this, "Scanned barcode is " + result, Toast.LENGTH_SHORT).show();
                 product_date.setText(result);
                 handleBarcode(result);
+                updateToSQL();
             }
         });
+    }
+
+    private void updateToSQL() {
+        if (!product_date.getText().toString().equals("") && !barcode_QTY.getText().toString().equals("") && !sscc_info.getText().toString().equals("")) {
+            listView.setVisibility(View.VISIBLE);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    con = connectionclass(username, password, databasename, ipaddress + ":" + portNumber);
+
+                    if (con == null) {
+                        Log.i("connection status", "connection null");
+                        Toast.makeText(ScannerActivity.this, "connection is failed", Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        Log.i("connection is", "successful");
+                        Toast.makeText(ScannerActivity.this, "connection is successful", Toast.LENGTH_SHORT).show();
+                        Statement stmt = null;
+                        int cnt = 0;
+                        try {
+                            //TODO, scanned data directly update to SQL database here
+                            stmt = con.createStatement();
+                            String query1 = "UPDATE " + dbTableName + " SET BARCODE_QTY=" + barcode_QTY + " WHERE ORD_LINE_NO=" + ordLineNo.get(position);
+                            String query2 = "UPDATE " + dbTableName + " SET PROD_DATE=" + product_date + " WHERE ORD_LINE_NO=" + ordLineNo.get(position);
+                            String query3 = "UPDATE " + dbTableName + " SET SSCC=" + sscc_info + " WHERE ORD_LINE_NO=" + ordLineNo.get(position);
+                            stmt.executeUpdate(query1);
+                            stmt.executeUpdate(query2);
+                            stmt.executeUpdate(query3);
+                            Toast.makeText(ScannerActivity.this, "Update " + dbTableName + " successful !", Toast.LENGTH_SHORT).show();
+                            con.close();
+                        }
+                        catch (SQLException e) {
+                            Log.e("ERROR", e.getMessage());
+                        }
+                    }
+                }
+            });
+        }
     }
 
     //TODO; barcode scaning result compare process here
@@ -324,12 +324,15 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         compSSCC = result.substring(0,2);
         if (compPRODATE.equals("91")) {
             product_date.setText(result.substring(2, len));// product date (91)2009 -> result will be write to 2009 on first field
-        }
-        if (compBARQTY_1.equals("240") && compBARQTY_2.contains("30")) {
-            barcode_QTY.setText(result.substring(len-1));//barcodeQTY (240)1234565433(30)1 -> result will be write to 1 on second field
-        }
+        } else
+////        if (compBARQTY_1.equals("240") && compBARQTY_2.contains("30")) {
+//        if (compBARQTY_1.equals("240")) {
+//            barcode_QTY.setText(result.substring(len-1));//barcodeQTY (240)1234565433(30)1 -> result will be write to 1 on second field
+//        }
         if (compSSCC.equals("00")) {
             sscc_info.setText(result.substring(2));//sscc (00)1234567890 -> result will be write to 1234567890 on last field
+        } else {
+            barcode_QTY.setText(result);
         }
     }
 
