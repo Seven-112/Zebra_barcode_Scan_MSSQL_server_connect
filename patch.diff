@@ -1,0 +1,72 @@
+diff --git a/app/src/main/java/com/connect/mssql/ScannerActivity.java b/app/src/main/java/com/connect/mssql/ScannerActivity.java
+index 8f1f6dc..634dcbd 100644
+--- a/app/src/main/java/com/connect/mssql/ScannerActivity.java
++++ b/app/src/main/java/com/connect/mssql/ScannerActivity.java
+@@ -58,7 +58,6 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener,
+     private Boolean isClicked = false;
+     TextView product_date, barcode_QTY, sscc_info;
+     ImageView backBtn;
+-    Button scanBtn, exportBtn;
+     private ListView listView;
+     ArrayList<String> ordLineNo = new ArrayList<>();
+     ArrayList<List> selectedProducts = new ArrayList<>();
+@@ -96,8 +95,6 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener,
+         barcode_QTY = findViewById(R.id.barcodeQtyDisp);
+         sscc_info = findViewById(R.id.ssccDisp);
+ 
+-        scanBtn = findViewById(R.id.scanStartBtn);
+-        exportBtn = findViewById(R.id.scanStopBtn);
+ 
+ 
+         this.overridePendingTransition(R.anim.animation_enter,
+diff --git a/app/src/main/res/layout/activity_scan.xml b/app/src/main/res/layout/activity_scan.xml
+index 7019eb2..455f7fd 100644
+--- a/app/src/main/res/layout/activity_scan.xml
++++ b/app/src/main/res/layout/activity_scan.xml
+@@ -33,12 +33,14 @@
+             android:layout_alignParentRight="true"/>
+ 
+     </RelativeLayout>
++    // order line number listView
+     <ListView
+         android:id="@+id/ordLineNoList"
+         android:layout_width="match_parent"
+         android:layout_below="@id/titleBar"
+         android:layout_height="200dp"
+         android:visibility="gone"/>
++    // result display textField
+     <RelativeLayout
+         android:layout_width="match_parent"
+         android:layout_below="@+id/ordLineNoList"
+@@ -75,30 +77,7 @@
+             android:textSize="20dp"
+             android:textAllCaps="false"
+             android:visibility="visible"/>
+-        <Button
+-            android:layout_width="300dp"
+-            android:layout_height="wrap_content"
+-            android:text="Scan start"
+-            android:textSize="25dp"
+-            android:textAllCaps="false"
+-            android:id="@+id/scanStartBtn"
+-            android:layout_below="@+id/ssccDisp"
+-            android:layout_marginTop="15dp"
+-            android:layout_centerHorizontal="true"
+-            android:visibility="gone"
+-            />
+-        <Button
+-            android:layout_width="300dp"
+-            android:layout_height="wrap_content"
+-            android:text="Export XML"
+-            android:textSize="25dp"
+-            android:textAllCaps="false"
+-            android:id="@+id/scanStopBtn"
+-            android:layout_centerHorizontal="true"
+-            android:visibility="gone"
+-            android:layout_below="@+id/scanStartBtn"
+-            android:layout_marginTop="15dp"
+-            />
++
+     </RelativeLayout>
+ 
+ 
