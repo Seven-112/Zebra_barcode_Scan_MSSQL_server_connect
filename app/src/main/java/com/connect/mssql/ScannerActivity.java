@@ -58,7 +58,6 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
     private Boolean isClicked = false;
     TextView product_date, barcode_QTY, sscc_info;
     ImageView backBtn;
-    Button scanBtn, exportBtn;
     private ListView listView;
     ArrayList<String> ordLineNo = new ArrayList<>();
     ArrayList<List> selectedProducts = new ArrayList<>();
@@ -96,8 +95,6 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         barcode_QTY = findViewById(R.id.barcodeQtyDisp);
         sscc_info = findViewById(R.id.ssccDisp);
 
-        scanBtn = findViewById(R.id.scanStartBtn);
-        exportBtn = findViewById(R.id.scanStopBtn);
 
 
         this.overridePendingTransition(R.anim.animation_enter,

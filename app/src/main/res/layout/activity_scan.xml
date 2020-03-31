@@ -33,12 +33,14 @@
             android:layout_alignParentRight="true"/>
 
     </RelativeLayout>
+    // order line number listView
     <ListView
         android:id="@+id/ordLineNoList"
         android:layout_width="match_parent"
         android:layout_below="@id/titleBar"
         android:layout_height="200dp"
         android:visibility="gone"/>
+    // result display textField
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_below="@+id/ordLineNoList"
@@ -75,30 +77,7 @@
             android:textSize="20dp"
             android:textAllCaps="false"
             android:visibility="visible"/>
-        <Button
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:text="Scan start"
-            android:textSize="25dp"
-            android:textAllCaps="false"
-            android:id="@+id/scanStartBtn"
-            android:layout_below="@+id/ssccDisp"
-            android:layout_marginTop="15dp"
-            android:layout_centerHorizontal="true"
-            android:visibility="gone"
-            />
-        <Button
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:text="Export XML"
-            android:textSize="25dp"
-            android:textAllCaps="false"
-            android:id="@+id/scanStopBtn"
-            android:layout_centerHorizontal="true"
-            android:visibility="gone"
-            android:layout_below="@+id/scanStartBtn"
-            android:layout_marginTop="15dp"
-            />
+
     </RelativeLayout>
 
 
