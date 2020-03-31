@@ -271,7 +271,7 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
 //                dataView.append(result + "\n"); // editText
 //                Toast.makeText(ScannerActivity.this, "Scanned barcode is " + result, Toast.LENGTH_SHORT).show();
                 handleBarcode(result);
-                updateToSQL();
+
             }
         });
     }
@@ -332,6 +332,7 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         if (compSSCC.equals("00")) {
             sscc_info.setText(result.substring(2));
         }
+        updateToSQL();
     }
 
     @Override

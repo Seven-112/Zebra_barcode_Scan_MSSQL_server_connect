@@ -1,5 +1,6 @@
 package com.connect.mssql;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -23,6 +24,11 @@ import android.widget.Toast;
 
 
 import com.connect.mssql.Model.AllProducts;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.sql.Connection;
 import java.sql.Driver;
@@ -40,7 +46,6 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 public class MainActivity extends AppCompatActivity {
 
     Connection con;
-
     String username, password, databasename, ipaddress, portNumber, dbTableName;
     List<String> supplierNumbers = new ArrayList<>();
     List<String> csmNumbers = new ArrayList<>();
@@ -52,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     List<String> barcodeQties = new ArrayList<>();
     List<String> proDates = new ArrayList<>();
     List<String> ssccs = new ArrayList<>();
-
+    DatabaseReference connect;
     List<String> eachPro = new ArrayList<>();
     ArrayList<List>  allPro = new ArrayList<>();
     SharedPreferences pref;
@@ -72,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         portNo = findViewById(R.id.portNo);
         dbname = findViewById(R.id.dbName);
         tableName = findViewById(R.id.tabelName);
+        connect = FirebaseDatabase.getInstance().getReference();
         userName = findViewById(R.id.userName);
         pwd = findViewById(R.id.password);
         sync = findViewById(R.id.syncBtn);
@@ -115,62 +121,85 @@ public class MainActivity extends AppCompatActivity {
                 editor.putString("password", password);
 
                 editor.commit(); // commit changes
-                con = connectionclass(username, password, databasename, ipaddress + ":" + portNumber);
+                connect.child("connect").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        String connectStatus = (String) dataSnapshot.getValue();
+                        Log.i(":", connectStatus);
+                        if (connectStatus.equals("true"))
+                            readFromSQL();
+                        else Toast.makeText(MainActivity.this, "Connection failed", Toast.LENGTH_SHORT).show();
+                    }
 
-                if (con == null) {
-                    Log.i("connection status", "connection null");
-                    Toast.makeText(MainActivity.this, "connection is failed", Toast.LENGTH_SHORT).show();
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                } else {
-                    Log.i("connection is", "successful");
-                    Toast.makeText(MainActivity.this, "connection is successful", Toast.LENGTH_SHORT).show();
-                    Statement stmt = null;
-                    int cnt = 0;
-                    try {
-                        stmt = con.createStatement();
-                        ResultSet reset = stmt.executeQuery(" select * from " + dbTableName);
+                    }
+                });
 
-                        while (reset.next())
-                        {
-                            eachPro = new ArrayList<>();
-                            String supplierNo = reset.getString(1);
-                            String csmNo = reset.getString(2);
-                            String ordNo = reset.getString(3);
-                            String ordLineNo = reset.getString(4);
-                            String artNo = reset.getString(5);
-                            String artName = reset.getString(6);
-                            String undispQty = reset.getString(7);
-                            String barcodeQty = reset.getString(8);
-                            String proDate = reset.getString(9);
-                            String sscc = reset.getString(10);
 
-                            supplierNumbers.add(supplierNo);
-                            csmNumbers.add(csmNo);
-                            ordNumbers.add(ordNo);
-                            ordLineNumbers.add(ordLineNo);
-                            artNumbers.add(artNo);
-                            artNames.add(artName);
-                            undispQties.add(undispQty);
-                            barcodeQties.add(barcodeQty);
-                            proDates.add(proDate);
-                            ssccs.add(sscc);
 
-                            eachPro.add(supplierNo);
-                            eachPro.add(csmNo);
-                            eachPro.add(ordNo);
-                            eachPro.add(ordLineNo);
-                            eachPro.add(artNo);
-                            eachPro.add(artName);
-                            eachPro.add(undispQty);
-                            eachPro.add(barcodeQty);
-                            eachPro.add(proDate);
-                            eachPro.add(sscc);
-                            allPro.add(eachPro);
-                        }
+            }
+        });
+    }
 
-                        con.close();
+    private void readFromSQL() {
+        con = connectionclass(username, password, databasename, ipaddress + ":" + portNumber);
 
-                        //TODO; all data from mssql server
+        if (con == null) {
+            Log.i("connection status", "connection null");
+            Toast.makeText(MainActivity.this, "connection is failed", Toast.LENGTH_SHORT).show();
+
+        } else {
+            Log.i("connection is", "successful");
+            Toast.makeText(MainActivity.this, "connection is successful", Toast.LENGTH_SHORT).show();
+            Statement stmt = null;
+            int cnt = 0;
+            try {
+                stmt = con.createStatement();
+                ResultSet reset = stmt.executeQuery(" select * from " + dbTableName);
+
+                while (reset.next())
+                {
+                    eachPro = new ArrayList<>();
+                    String supplierNo = reset.getString(1);
+                    String csmNo = reset.getString(2);
+                    String ordNo = reset.getString(3);
+                    String ordLineNo = reset.getString(4);
+                    String artNo = reset.getString(5);
+                    String artName = reset.getString(6);
+                    String undispQty = reset.getString(7);
+                    String barcodeQty = reset.getString(8);
+                    String proDate = reset.getString(9);
+                    String sscc = reset.getString(10);
+
+                    supplierNumbers.add(supplierNo);
+                    csmNumbers.add(csmNo);
+                    ordNumbers.add(ordNo);
+                    ordLineNumbers.add(ordLineNo);
+                    artNumbers.add(artNo);
+                    artNames.add(artName);
+                    undispQties.add(undispQty);
+                    barcodeQties.add(barcodeQty);
+                    proDates.add(proDate);
+                    ssccs.add(sscc);
+
+                    eachPro.add(supplierNo);
+                    eachPro.add(csmNo);
+                    eachPro.add(ordNo);
+                    eachPro.add(ordLineNo);
+                    eachPro.add(artNo);
+                    eachPro.add(artName);
+                    eachPro.add(undispQty);
+                    eachPro.add(barcodeQty);
+                    eachPro.add(proDate);
+                    eachPro.add(sscc);
+                    allPro.add(eachPro);
+                }
+
+                con.close();
+
+                //TODO; all data from mssql server
 //                Log.v("supplierNo:", String.valueOf(supplierNumbers));
 //                Log.v("csmNo:", String.valueOf(csmNumbers));
 //                Log.v("ordNo:", String.valueOf(ordNumbers));
@@ -184,21 +213,17 @@ public class MainActivity extends AppCompatActivity {
 //                Log.v("allPro:", String.valueOf(allPro));
 //                Log.v("firstPro:", String.valueOf(allPro.get(0).get(1)));
 
-                        AllProducts allProducts = new AllProducts();
+                AllProducts allProducts = new AllProducts();
 
-                        allProducts.setAllproducts(allPro);
-                        Intent intent = new Intent(MainActivity.this, CsmListActivity.class);
-                        startActivity(intent);
-
-                    }
-                    catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
-
+                allProducts.setAllproducts(allPro);
+                Intent intent = new Intent(MainActivity.this, CsmListActivity.class);
+                startActivity(intent);
 
             }
-        });
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
