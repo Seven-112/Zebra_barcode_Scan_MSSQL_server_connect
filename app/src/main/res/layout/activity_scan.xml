@@ -34,12 +34,13 @@
 
     </RelativeLayout>
     // order line number listView
+
     <ListView
         android:id="@+id/ordLineNoList"
         android:layout_width="match_parent"
-        android:layout_below="@id/titleBar"
         android:layout_height="200dp"
-        android:visibility="gone"/>
+        android:layout_below="@id/titleBar"
+        android:visibility="visible" />
     // result display textField
     <RelativeLayout
         android:layout_width="match_parent"

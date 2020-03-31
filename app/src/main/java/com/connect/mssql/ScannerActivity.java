@@ -54,7 +54,7 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
     Connection con;
     String username, password, databasename, ipaddress, portNumber, dbTableName;
     SharedPreferences pref;
-
+    int j = 0;
     private Boolean isClicked = false;
     TextView product_date, barcode_QTY, sscc_info;
     ImageView backBtn;
@@ -274,41 +274,52 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
     }
 
     private void updateToSQL() {
-        if (!product_date.getText().toString().equals("") && !barcode_QTY.getText().toString().equals("") && !sscc_info.getText().toString().equals("")) {
-            listView.setVisibility(View.VISIBLE);
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        con = connectionclass(username, password, databasename, ipaddress + ":" + portNumber);
 
-                    con = connectionclass(username, password, databasename, ipaddress + ":" + portNumber);
+        if (con == null) {
+            Log.i("connection status", "connection null");
+//            Toast.makeText(ScannerActivity.this, "connection is failed", Toast.LENGTH_SHORT).show();
 
-                    if (con == null) {
-                        Log.i("connection status", "connection null");
-                        Toast.makeText(ScannerActivity.this, "connection is failed", Toast.LENGTH_SHORT).show();
+        } else {
+            Log.i("connection is", "successful");
+//            Toast.makeText(ScannerActivity.this, "connection is successful", Toast.LENGTH_SHORT).show();
+            Statement stmt = null;
+//            int cnt = 0;
 
-                    } else {
-                        Log.i("connection is", "successful");
-                        Toast.makeText(ScannerActivity.this, "connection is successful", Toast.LENGTH_SHORT).show();
-                        Statement stmt = null;
-                        int cnt = 0;
-                        try {
-                            //TODO, scanned data directly update to SQL database here
-                            stmt = con.createStatement();
-                            String query1 = "UPDATE " + dbTableName + " SET BARCODE_QTY=" + barcode_QTY + " WHERE ORD_LINE_NO=" + ordLineNo.get(position);
-                            String query2 = "UPDATE " + dbTableName + " SET PROD_DATE=" + product_date + " WHERE ORD_LINE_NO=" + ordLineNo.get(position);
-                            String query3 = "UPDATE " + dbTableName + " SET SSCC=" + sscc_info + " WHERE ORD_LINE_NO=" + ordLineNo.get(position);
-                            stmt.executeUpdate(query1);
-                            stmt.executeUpdate(query2);
-                            stmt.executeUpdate(query3);
-                            Toast.makeText(ScannerActivity.this, "Update " + dbTableName + " successful !", Toast.LENGTH_SHORT).show();
-                            con.close();
-                        }
-                        catch (SQLException e) {
-                            Log.e("ERROR", e.getMessage());
-                        }
+            String barcode = barcode_QTY.getText().toString();
+            String proDate = product_date.getText().toString();
+            String sscc = sscc_info.getText().toString();
+            try {
+                //TODO, scanned data directly update to SQL database here
+                if (!barcode.equals("") && !proDate.equals("") && !sscc.equals("")){
+                    for (int i = j; i < ordLineNo.size(); i ++) {
+
+                        stmt = con.createStatement();
+                        String query1 = "UPDATE " + dbTableName + " SET BARCODE_QTY=" + barcode + " WHERE ORD_LINE_NO=" + ordLineNo.get(i);
+                        String query2 = "UPDATE " + dbTableName + " SET PROD_DATE=" + proDate + " WHERE ORD_LINE_NO=" + ordLineNo.get(i);
+                        String query3 = "UPDATE " + dbTableName + " SET SSCC=" + sscc + " WHERE ORD_LINE_NO=" + ordLineNo.get(i);
+                        stmt.executeUpdate(query1);
+                        stmt.executeUpdate(query2);
+                        stmt.executeUpdate(query3);
+
+                        Toast.makeText(ScannerActivity.this, "Update " + dbTableName + " successful !", Toast.LENGTH_SHORT).show();
+
+                        barcode_QTY.setText("");
+                        product_date.setText("");
+                        sscc_info.setText("");
+                        barcode = "";
+                        proDate = "";
+                        sscc = "";
+                        j = i +1;
                     }
+
+
                 }
-            });
+                con.close();
+            }
+            catch (SQLException e) {
+                Log.e("ERROR", e.getMessage());
+            }
         }
     }
 
