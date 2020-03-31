@@ -121,14 +121,14 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
 
         for (int i = 0; i < selectedProducts.size(); i ++) {
             if (selectedProducts.get(i).get(1).equals(CSM_NO) && selectedProducts.get(i).get(4).equals(ART_NO)) {
-                if (selectedProducts.get(i).get(7).equals("") || selectedProducts.get(i).get(7) == null) {
-                    if (selectedProducts.get(i).get(8).equals("") || selectedProducts.get(i).get(8) == null) {
-                        if (selectedProducts.get(i).get(9).equals("") || selectedProducts.get(i).get(9) == null) {
-                            ordLineNo.add((String) selectedProducts.get(i).get(3));
-                        }
-                    }
-                }
-//                ordLineNo.add((String) selectedProducts.get(i).get(3));
+//                if (selectedProducts.get(i).get(7).equals("") || selectedProducts.get(i).get(7) == null) {
+//                    if (selectedProducts.get(i).get(8).equals("") || selectedProducts.get(i).get(8) == null) {
+//                        if (selectedProducts.get(i).get(9).equals("") || selectedProducts.get(i).get(9) == null) {
+//                            ordLineNo.add((String) selectedProducts.get(i).get(3));
+//                        }
+//                    }
+//                }
+                ordLineNo.add((String) selectedProducts.get(i).get(3));
 
             }
 
