@@ -85,10 +85,6 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
     String compBARQTY_2 = "";
     String compSSCC = "";
 
-    Boolean flag_1 = false;
-    Boolean flag_2 = false;
-    Boolean flag_3 = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -273,8 +269,7 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
                     dataLength = 0;
                 }
 //                dataView.append(result + "\n"); // editText
-                Toast.makeText(ScannerActivity.this, "Scanned barcode is " + result, Toast.LENGTH_SHORT).show();
-                product_date.setText(result);
+//                Toast.makeText(ScannerActivity.this, "Scanned barcode is " + result, Toast.LENGTH_SHORT).show();
                 handleBarcode(result);
                 updateToSQL();
             }
@@ -328,23 +323,14 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         compBARQTY_2 = result.substring(len-3);
         compSSCC = result.substring(0,2);
 
-        if (!flag_1) {
-            if (compPRODATE.equals("91")) {
-                product_date.setText(result.substring(2, len));
-                flag_1 = true;
-            }
+        if (compPRODATE.equals("91")) {
+            product_date.setText(result.substring(2, len));
         }
-        if (!flag_2) {
-            if (compBARQTY_1.equals("240") && compBARQTY_2.contains("30")) {
-                barcode_QTY.setText(result.substring(len-1));
-                flag_2 = true;
-            }
+        if (compBARQTY_1.equals("240") && compBARQTY_2.contains("30")) {
+            barcode_QTY.setText(result.substring(len-1));
         }
-        if (!flag_3) {
-            if (compSSCC.equals("00")) {
-                sscc_info.setText(result.substring(2));
-                flag_3 = true;
-            }
+        if (compSSCC.equals("00")) {
+            sscc_info.setText(result.substring(2));
         }
     }
 
@@ -426,7 +412,7 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
             public void run() {
                 // Update the status text view on UI thread with current scanner state
 //                statusTextView.setText(""+  status);
-                Toast.makeText(ScannerActivity.this, "" + status, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(ScannerActivity.this, "" + status, Toast.LENGTH_SHORT).show();
             }
         });
     }
