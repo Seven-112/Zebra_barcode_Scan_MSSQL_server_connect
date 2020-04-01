@@ -10,16 +10,17 @@ import android.widget.TextView;
 
 import com.connect.mssql.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ScanListAdapter extends ArrayAdapter<String> {
 
     private final Activity context;
-    private final List<String> ordLineNo;
+    private final ArrayList<String> ordLineNo;
 //    private final List<Integer> images;
 
-    public ScanListAdapter(Activity context, List<String> ordLineNo) {
-        super(context, R.layout.csmitem, ordLineNo);
+    public ScanListAdapter(Activity context, ArrayList<String> ordLineNo) {
+        super(context, R.layout.scanitem, ordLineNo);
         // TODO Auto-generated constructor stub
 
         this.context=context;

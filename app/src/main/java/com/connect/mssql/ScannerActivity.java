@@ -69,8 +69,6 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
     private String ART_NO = "";
     AllProducts allProducts = new AllProducts();
     //TODO; emdk parts
-    //Assign the profile name used in EMDKConfig.xml
-    private String profileName = "DataCaptureProfile";
 
     private EMDKManager emdkManager = null;
     private BarcodeManager barcodeManager = null;
@@ -136,6 +134,13 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
 
         ScanListAdapter scanListAdapter = new ScanListAdapter(ScannerActivity.this, ordLineNo);
         listView.setAdapter(scanListAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                updateToSQL(position);
+            }
+        });
 
 
         EMDKResults results = EMDKManager.getEMDKManager(getApplicationContext(), this);
@@ -273,12 +278,12 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         });
     }
 
-    private void updateToSQL() {
+    private void updateToSQL(int position) {
         con = connectionclass(username, password, databasename, ipaddress + ":" + portNumber);
 
         if (con == null) {
             Log.i("connection status", "connection null");
-//            Toast.makeText(ScannerActivity.this, "connection is failed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ScannerActivity.this, "connection is failed", Toast.LENGTH_SHORT).show();
 
         } else {
             Log.i("connection is", "successful");
@@ -286,35 +291,35 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
             Statement stmt = null;
 //            int cnt = 0;
 
-            String barcode = barcode_QTY.getText().toString();
-            String proDate = product_date.getText().toString();
-            String sscc = sscc_info.getText().toString();
+
             try {
-                //TODO, scanned data directly update to SQL database here
+
+                String barcode = barcode_QTY.getText().toString();
+                String proDate = product_date.getText().toString();
+                String sscc = sscc_info.getText().toString();
                 if (!barcode.equals("") && !proDate.equals("") && !sscc.equals("")){
-                    for (int i = j; i < ordLineNo.size(); i ++) {
 
-                        stmt = con.createStatement();
-                        String query1 = "UPDATE " + dbTableName + " SET BARCODE_QTY=" + barcode + " WHERE ORD_LINE_NO=" + ordLineNo.get(i);
-                        String query2 = "UPDATE " + dbTableName + " SET PROD_DATE=" + proDate + " WHERE ORD_LINE_NO=" + ordLineNo.get(i);
-                        String query3 = "UPDATE " + dbTableName + " SET SSCC=" + sscc + " WHERE ORD_LINE_NO=" + ordLineNo.get(i);
-                        stmt.executeUpdate(query1);
-                        stmt.executeUpdate(query2);
-                        stmt.executeUpdate(query3);
+                    stmt = con.createStatement();
 
-                        Toast.makeText(ScannerActivity.this, "Update " + dbTableName + " successful !", Toast.LENGTH_SHORT).show();
+                    String orderlineNo = ordLineNo.get(position);
 
-                        barcode_QTY.setText("");
-                        product_date.setText("");
-                        sscc_info.setText("");
-                        barcode = "";
-                        proDate = "";
-                        sscc = "";
-                        j = i +1;
-                    }
+                    String query1 = "UPDATE " + dbTableName + String.format(" SET BARCODE_QTY='%s' WHERE ORD_LINE_NO=%s", barcode, orderlineNo);
+                    String query2 = "UPDATE " + dbTableName + String.format(" SET PROD_DATE='%s' WHERE ORD_LINE_NO=%s", proDate, orderlineNo);
+                    String query3 = "UPDATE " + dbTableName + String.format(" SET SSCC='%s' WHERE ORD_LINE_NO=%s", sscc, orderlineNo);
+                    stmt.executeUpdate(query1);
+                    stmt.executeUpdate(query2);
+                    stmt.executeUpdate(query3);
 
+                    Toast.makeText(ScannerActivity.this, "Updating '" + dbTableName + "' has succeed!", Toast.LENGTH_SHORT).show();
 
+                    barcode_QTY.setText("");
+                    product_date.setText("");
+                    sscc_info.setText("");
+
+                } else {
+                    Toast.makeText(ScannerActivity.this, "There are one or more empty fields. Please make sure if you scanned all of things.", Toast.LENGTH_LONG).show();
                 }
+
                 con.close();
             }
             catch (SQLException e) {
@@ -340,7 +345,7 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         if (compSSCC.equals("00")) {
             sscc_info.setText(result.substring(2));
         }
-        updateToSQL();
+
     }
 
     @Override
