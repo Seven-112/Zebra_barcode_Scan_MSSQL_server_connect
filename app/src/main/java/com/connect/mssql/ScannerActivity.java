@@ -61,10 +61,7 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
     private ListView listView;
     ArrayList<String> ordLineNo = new ArrayList<>();
     ArrayList<List> selectedProducts = new ArrayList<>();
-    ArrayList<List> InitPro = new ArrayList<>();
-    ArrayList<List> scannedPro = new ArrayList<>();
-    ArrayList<String> scannedEachPro = new ArrayList<>();
-    ArrayList<Integer> images = new ArrayList<>();
+    ArrayList<List> ordLinePro = new ArrayList<>();
     private String CSM_NO = "";
     private String ART_NO = "";
     AllProducts allProducts = new AllProducts();
@@ -119,26 +116,29 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
 
         for (int i = 0; i < selectedProducts.size(); i ++) {
             if (selectedProducts.get(i).get(1).equals(CSM_NO) && selectedProducts.get(i).get(4).equals(ART_NO)) {
-//                if (selectedProducts.get(i).get(7).equals("") || selectedProducts.get(i).get(7) == null) {
-//                    if (selectedProducts.get(i).get(8).equals("") || selectedProducts.get(i).get(8) == null) {
-//                        if (selectedProducts.get(i).get(9).equals("") || selectedProducts.get(i).get(9) == null) {
-//                            ordLineNo.add((String) selectedProducts.get(i).get(3));
-//                        }
-//                    }
-//                }
                 ordLineNo.add((String) selectedProducts.get(i).get(3));
-
             }
-
         }
+
 
         ScanListAdapter scanListAdapter = new ScanListAdapter(ScannerActivity.this, ordLineNo);
         listView.setAdapter(scanListAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                updateToSQL(position);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+                for (int i = 0; i < selectedProducts.size(); i ++) {
+                    if (selectedProducts.get(i).get(1).equals(CSM_NO) && selectedProducts.get(i).get(4).equals(ART_NO) && selectedProducts.get(i).get(3).equals(ordLineNo.get(position))) {
+                        ordLinePro.add(selectedProducts.get(i));
+                    }
+                }
+                for (int j = 0; j < ordLinePro.size(); j ++) {
+                    if (ordLinePro.get(j).get(7).equals(barcode_QTY.getText().toString()) && ordLinePro.get(j).get(8).equals(product_date.getText().toString()) && ordLinePro.get(j).get(9).equals(sscc_info.getText().toString()))
+                        Toast.makeText(ScannerActivity.this, "Already scanned!", Toast.LENGTH_SHORT).show();
+                    else
+                        updateToSQL(position);
+                }
+
             }
         });
 
@@ -302,10 +302,11 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
                     stmt = con.createStatement();
 
                     String orderlineNo = ordLineNo.get(position);
-
-                    String query1 = "UPDATE " + dbTableName + String.format(" SET BARCODE_QTY='%s' WHERE ORD_LINE_NO=%s", barcode, orderlineNo);
-                    String query2 = "UPDATE " + dbTableName + String.format(" SET PROD_DATE='%s' WHERE ORD_LINE_NO=%s", proDate, orderlineNo);
-                    String query3 = "UPDATE " + dbTableName + String.format(" SET SSCC='%s' WHERE ORD_LINE_NO=%s", sscc, orderlineNo);
+                    String csm = CSM_NO;
+                    String art = ART_NO;
+                    String query1 = "UPDATE " + dbTableName + String.format(" SET BARCODE_QTY='%s' WHERE ORD_LINE_NO=%s AND CSM_NO=%s AND ART_NO=%s", barcode, orderlineNo, csm, art);
+                    String query2 = "UPDATE " + dbTableName + String.format(" SET PROD_DATE='%s' WHERE ORD_LINE_NO=%s AND CSM_NO=%s AND ART_NO=%s", proDate, orderlineNo, csm, art);
+                    String query3 = "UPDATE " + dbTableName + String.format(" SET SSCC='%s' WHERE ORD_LINE_NO=%s AND CSM_NO=%s AND ART_NO=%s", sscc, orderlineNo, csm, art);
                     stmt.executeUpdate(query1);
                     stmt.executeUpdate(query2);
                     stmt.executeUpdate(query3);
