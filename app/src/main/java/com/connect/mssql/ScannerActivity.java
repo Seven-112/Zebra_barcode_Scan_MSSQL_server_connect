@@ -304,9 +304,9 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
                     String orderlineNo = ordLineNo.get(position);
                     String csm = CSM_NO;
                     String art = ART_NO;
-                    String query1 = "UPDATE " + dbTableName + String.format(" SET BARCODE_QTY='%s' WHERE ORD_LINE_NO=%s AND CSM_NO=%s AND ART_NO=%s", barcode, orderlineNo, csm, art);
-                    String query2 = "UPDATE " + dbTableName + String.format(" SET PROD_DATE='%s' WHERE ORD_LINE_NO=%s AND CSM_NO=%s AND ART_NO=%s", proDate, orderlineNo, csm, art);
-                    String query3 = "UPDATE " + dbTableName + String.format(" SET SSCC='%s' WHERE ORD_LINE_NO=%s AND CSM_NO=%s AND ART_NO=%s", sscc, orderlineNo, csm, art);
+                    String query1 = "UPDATE " + dbTableName + String.format(" SET BARCODE_QTY='%s' WHERE ORD_LINE_NO=%s AND CSM_NO='%s' AND ART_NO=%s", barcode, orderlineNo, csm, art);
+                    String query2 = "UPDATE " + dbTableName + String.format(" SET PROD_DATE='%s' WHERE ORD_LINE_NO=%s AND CSM_NO='%s' AND ART_NO=%s", proDate, orderlineNo, csm, art);
+                    String query3 = "UPDATE " + dbTableName + String.format(" SET SSCC='%s' WHERE ORD_LINE_NO=%s AND CSM_NO='%s' AND ART_NO=%s", sscc, orderlineNo, csm, art);
                     stmt.executeUpdate(query1);
                     stmt.executeUpdate(query2);
                     stmt.executeUpdate(query3);
