@@ -62,6 +62,7 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
     ArrayList<String> ordLineNo = new ArrayList<>();
     ArrayList<List> selectedProducts = new ArrayList<>();
     ArrayList<List> ordLinePro = new ArrayList<>();
+    ArrayList<String> all_sscc_data = new ArrayList<>();
     private String CSM_NO = "";
     private String ART_NO = "";
     AllProducts allProducts = new AllProducts();
@@ -78,6 +79,10 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
     String compBARQTY_1 = "";
     String compBARQTY_2 = "";
     String compSSCC = "";
+
+    Boolean barcode_scan_status = false;
+    Boolean prodate_scan_status = false;
+    Boolean sscc_scan_status = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,8 +120,12 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         selectedProducts = allProducts.getAllproducts();
 
         for (int i = 0; i < selectedProducts.size(); i ++) {
+            //TODO; all sscc array
             if (selectedProducts.get(i).get(1).equals(CSM_NO) && selectedProducts.get(i).get(4).equals(ART_NO)) {
-                ordLineNo.add((String) selectedProducts.get(i).get(3));
+                if ((selectedProducts.get(i).get(7).equals("") || selectedProducts.get(i).get(7) == null ) && (selectedProducts.get(i).get(8).equals("") || selectedProducts.get(i).get(8) == null) && (selectedProducts.get(i).get(9).equals("") || selectedProducts.get(i).get(9) == null))
+                {
+                    ordLineNo.add((String) selectedProducts.get(i).get(3));
+                }
             }
         }
 
@@ -127,17 +136,18 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                for (int i = 0; i < selectedProducts.size(); i ++) {
-                    if (selectedProducts.get(i).get(1).equals(CSM_NO) && selectedProducts.get(i).get(4).equals(ART_NO) && selectedProducts.get(i).get(3).equals(ordLineNo.get(position))) {
-                        ordLinePro.add(selectedProducts.get(i));
-                    }
-                }
-                for (int j = 0; j < ordLinePro.size(); j ++) {
-                    if (ordLinePro.get(j).get(7).equals(barcode_QTY.getText().toString()) && ordLinePro.get(j).get(8).equals(product_date.getText().toString()) && ordLinePro.get(j).get(9).equals(sscc_info.getText().toString()))
-                        Toast.makeText(ScannerActivity.this, "Already scanned!", Toast.LENGTH_SHORT).show();
-                    else
-                        updateToSQL(position);
-                }
+//                for (int i = 0; i < selectedProducts.size(); i ++) {
+//                    if (selectedProducts.get(i).get(1).equals(CSM_NO) && selectedProducts.get(i).get(4).equals(ART_NO) && selectedProducts.get(i).get(3).equals(ordLineNo.get(position))) {
+//                        ordLinePro.add(selectedProducts.get(i));
+//                    }
+//                }
+//                for (int j = 0; j < ordLinePro.size(); j ++) {
+//                    if (ordLinePro.get(j).get(7).equals(barcode_QTY.getText().toString()) && ordLinePro.get(j).get(8).equals(product_date.getText().toString()) && ordLinePro.get(j).get(9).equals(sscc_info.getText().toString()))
+//                        Toast.makeText(ScannerActivity.this, "Already scanned!", Toast.LENGTH_SHORT).show();
+//                    else
+//                        updateToSQL(position);
+//                }
+                updateToSQL(position);
 
             }
         });
@@ -344,7 +354,19 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
             barcode_QTY.setText(result.substring(len-1));
         }
         if (compSSCC.equals("00")) {
-            sscc_info.setText(result.substring(2));
+            String scannedSSCC = result.substring(2);
+            sscc_info.setText(scannedSSCC);
+            for (int i = 0; i < selectedProducts.size(); i++)
+            {
+                String recordedSSCC = (String) selectedProducts.get(i).get(9);
+                if (scannedSSCC.equals(recordedSSCC))
+                {
+                    Toast.makeText(ScannerActivity.this, "SSCC has already been scanned!", Toast.LENGTH_LONG).show();
+                    sscc_info.setText("");
+
+                }
+            }
+
         }
 
     }
