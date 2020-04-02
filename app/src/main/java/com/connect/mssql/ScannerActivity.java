@@ -83,6 +83,14 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
     Boolean barcode_scan_status = false;
     Boolean prodate_scan_status = false;
     Boolean sscc_scan_status = false;
+    ScanListAdapter scanListAdapter;
+
+    private void goback() {
+        Intent intent = new Intent(ScannerActivity.this, ArtListActivity.class);
+        intent.putExtra("CSM_NO", CSM_NO);
+
+        finish();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,11 +116,7 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                Intent intent = new Intent(ScannerActivity.this, ArtListActivity.class);
-                intent.putExtra("CSM_NO", CSM_NO);
-
-                finish();
+                goback();
             }
         });
 
@@ -122,7 +126,9 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         for (int i = 0; i < selectedProducts.size(); i ++) {
             //TODO; all sscc array
             if (selectedProducts.get(i).get(1).equals(CSM_NO) && selectedProducts.get(i).get(4).equals(ART_NO)) {
-                if ((selectedProducts.get(i).get(7).equals("") || selectedProducts.get(i).get(7) == null ) && (selectedProducts.get(i).get(8).equals("") || selectedProducts.get(i).get(8) == null) && (selectedProducts.get(i).get(9).equals("") || selectedProducts.get(i).get(9) == null))
+                if ((selectedProducts.get(i).get(7).equals("") || selectedProducts.get(i).get(7) == null )
+                        && (selectedProducts.get(i).get(8).equals("") || selectedProducts.get(i).get(8) == null)
+                        && (selectedProducts.get(i).get(9).equals("") || selectedProducts.get(i).get(9) == null))
                 {
                     ordLineNo.add((String) selectedProducts.get(i).get(3));
                 }
@@ -130,23 +136,13 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         }
 
 
-        ScanListAdapter scanListAdapter = new ScanListAdapter(ScannerActivity.this, ordLineNo);
+        scanListAdapter = new ScanListAdapter(ScannerActivity.this, ordLineNo);
         listView.setAdapter(scanListAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-//                for (int i = 0; i < selectedProducts.size(); i ++) {
-//                    if (selectedProducts.get(i).get(1).equals(CSM_NO) && selectedProducts.get(i).get(4).equals(ART_NO) && selectedProducts.get(i).get(3).equals(ordLineNo.get(position))) {
-//                        ordLinePro.add(selectedProducts.get(i));
-//                    }
-//                }
-//                for (int j = 0; j < ordLinePro.size(); j ++) {
-//                    if (ordLinePro.get(j).get(7).equals(barcode_QTY.getText().toString()) && ordLinePro.get(j).get(8).equals(product_date.getText().toString()) && ordLinePro.get(j).get(9).equals(sscc_info.getText().toString()))
-//                        Toast.makeText(ScannerActivity.this, "Already scanned!", Toast.LENGTH_SHORT).show();
-//                    else
-//                        updateToSQL(position);
-//                }
+
                 updateToSQL(position);
 
             }
@@ -189,24 +185,13 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
 
     private void initScanner() {
         if (scanner == null) {
-            // Get default scanner defined on the device
             scanner = barcodeManager.getDevice(BarcodeManager.DeviceIdentifier.DEFAULT);
             if(scanner != null) {
-                // Implement the DataListener interface and pass the pointer of this object to get the data callbacks.
                 scanner.addDataListener(this);
-
-                // Implement the StatusListener interface and pass the pointer of this object to get the status callbacks.
                 scanner.addStatusListener(this);
-
-                // Hard trigger. When this mode is set, the user has to manually
-                // press the trigger on the device after issuing the read call.
-                // NOTE: For devices without a hard trigger, use TriggerType.SOFT_ALWAYS.
                 scanner.triggerType =  TriggerType.HARD;
 
                 try{
-                    // Enable the scanner
-                    // NOTE: After calling enable(), wait for IDLE status before calling other scanner APIs
-                    // such as setConfig() or read().
                     scanner.enable();
 
                 } catch (ScannerException e) {
@@ -217,8 +202,6 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
                 updateStatus("Failed to   initialize the scanner device.");
             }
         }
-
-
     }
 
     private void deInitScanner() {
@@ -235,14 +218,8 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
 
     @Override
     public void onOpened(EMDKManager emdkManager) {
-
-        // Get a reference to EMDKManager
         this.emdkManager =  emdkManager;
-
-        // Get a  reference to the BarcodeManager feature object
         initBarcodeManager();
-
-        // Initialize the scanner
         initScanner();
 
 
@@ -252,21 +229,8 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
         String dataStr = "";
         if ((scanDataCollection != null) &&   (scanDataCollection.getResult() == ScannerResults.SUCCESS)) {
             ArrayList<ScanData> scanData =  scanDataCollection.getScanData();
-            // Iterate through scanned data and prepare the data.
-
-//            ScanDataCollection.LabelType labelType = data.getLabelType();
-            // Concatenate barcode data and label type
             String barcodeData = scanData.get(0).getData();
-//                product_date.setText(barcodeData);
             dataStr =  barcodeData;
-
-//            for (ScanData data :  scanData) {
-//                // Get the scanned dataString barcodeData =  data.getData();
-//                // Get the type of label being scanned
-//
-////                dataStr =  barcodeData + "  " +  labelType;
-//            }
-            // Updates EditText with scanned data and type of label on UI thread.
             updateData(dataStr);
         }
     }
@@ -274,14 +238,9 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
     private void updateData(final String result) {
         runOnUiThread(new Runnable() {
             @Override public void run() {
-                // Update the dataView EditText on UI thread with barcode data and its label type.
                 if (dataLength++ >= 50) {
-                    // Clear the cache after 50 scans
-//                    dataView.getText().clear();
                     dataLength = 0;
                 }
-//                dataView.append(result + "\n"); // editText
-//                Toast.makeText(ScannerActivity.this, "Scanned barcode is " + result, Toast.LENGTH_SHORT).show();
                 handleBarcode(result);
 
             }
@@ -297,11 +256,7 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
 
         } else {
             Log.i("connection is", "successful");
-//            Toast.makeText(ScannerActivity.this, "connection is successful", Toast.LENGTH_SHORT).show();
             Statement stmt = null;
-//            int cnt = 0;
-
-
             try {
 
                 String barcode = barcode_QTY.getText().toString();
@@ -323,9 +278,14 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
 
                     Toast.makeText(ScannerActivity.this, "Updating '" + dbTableName + "' has succeed!", Toast.LENGTH_SHORT).show();
 
+                    // update global variable
+
                     barcode_QTY.setText("");
                     product_date.setText("");
                     sscc_info.setText("");
+                    updateLocalVariable(position);
+                    finish();
+                    startActivity(getIntent());
 
                 } else {
                     Toast.makeText(ScannerActivity.this, "There are one or more empty fields. Please make sure if you scanned all of things.", Toast.LENGTH_LONG).show();
@@ -337,6 +297,34 @@ public class ScannerActivity extends AppCompatActivity implements EMDKListener, 
                 Log.e("ERROR", e.getMessage());
             }
         }
+    }
+
+    private void updateLocalVariable(int position) {
+
+        for (int i = 0; i < selectedProducts.size(); i ++) {
+            if (selectedProducts.get(i).get(1).equals(CSM_NO) && selectedProducts.get(i).get(4).equals(ART_NO)
+                    && selectedProducts.get(i).get(3).equals(ordLineNo.get(position))) {
+                selectedProducts.get(i).set(7, barcode_QTY.getText().toString());
+                selectedProducts.get(i).set(8, product_date.getText().toString());
+                selectedProducts.get(i).set(9, sscc_info.getText().toString());
+
+            }
+        }
+        allProducts.setAllproducts(selectedProducts);
+//
+//        ordLineNo = new ArrayList<>();
+//
+//        for (int i = 0; i < selectedProducts.size(); i ++) {
+//            //TODO; all sscc array
+//
+//            if (selectedProducts.get(i).get(1).equals(CSM_NO) && selectedProducts.get(i).get(4).equals(ART_NO)) {
+//                if ((selectedProducts.get(i).get(7).equals("") || selectedProducts.get(i).get(7) == null ) && (selectedProducts.get(i).get(8).equals("") || selectedProducts.get(i).get(8) == null) && (selectedProducts.get(i).get(9).equals("") || selectedProducts.get(i).get(9) == null))
+//                {
+//                    ordLineNo.add((String) selectedProducts.get(i).get(3));
+//                }
+//            }
+//        }
+
     }
 
     //TODO; barcode scaning result compare process here

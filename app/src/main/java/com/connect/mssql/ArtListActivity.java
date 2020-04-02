@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -153,6 +154,7 @@ public class ArtListActivity extends AppCompatActivity {
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .show();
                 } else {
+
                     Intent intent = new Intent(ArtListActivity.this, ScannerActivity.class);
                     intent.putExtra("CSM_NO", CSM_NO);
                     intent.putExtra("ART_NO", art_no_list.get(position));
